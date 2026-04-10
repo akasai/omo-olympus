@@ -26,11 +26,22 @@
     "agent-persona",
     "greek-mythology"
   ],
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
   "peerDependencies": {
     "@opencode-ai/plugin": ">=1.4.3"
   },
   "peerDependenciesMeta": {
-    "@opentui/core": { "optional": true },
-    "@opentui/solid": { "optional": true }
+    "@opentui/core": {
+      "optional": true
+    },
+    "@opentui/solid": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "vitest": "4.1.4"
   }
 }

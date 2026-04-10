@@ -16,7 +16,7 @@ function writePending(list: PendingEntry[]) {
   fs.writeFileSync(PENDING_FILE, JSON.stringify(list))
 }
 
-function inferAgent(tool: string, args: any): string | null {
+export function inferAgent(tool: string, args: any): string | null {
   if (tool !== "task" && tool !== "delegate_task") return null
   const sub = String(args?.subagent_type ?? "").toLowerCase()
   if (sub === "explore") return "explore"

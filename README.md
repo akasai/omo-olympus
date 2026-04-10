@@ -163,6 +163,12 @@ cp src/server.ts ~/.config/opencode/plugins/omo-olympus-server.ts
 
 Edit, restart opencode, see your changes live.
 
+Run tests:
+
+```bash
+npm test
+```
+
 ## License
 
 MIT
