@@ -1,76 +1,147 @@
-# omo-olympus
+<!-- <CENTERED SECTION FOR GITHUB DISPLAY> -->
 
-Greek mythology personas for [opencode](https://opencode.ai) agents. Your AI workflow, narrated by the gods.
+<div align="center">
+
+# 🏛️ omo-olympus
+
+**Your agents have names. Now they have faces.**
+
+[![npm](https://img.shields.io/npm/v/omo-olympus?color=369eff&labelColor=black&logo=npm&style=flat-square)](https://www.npmjs.com/package/omo-olympus)
+[![License](https://img.shields.io/badge/license-MIT-white?labelColor=black&style=flat-square)](LICENSE)
+
+[English](README.md) | [한국어](README.ko.md)
+
+</div>
+
+<!-- </CENTERED SECTION FOR GITHUB DISPLAY> -->
 
 ```
 ▼ Olympus
- 🪨 Sisyphus   Pushing uphill...
- 🔍 Explorer   Following a lead...
- 📚 Librarian  Cross-referencing...
- 🧙 Oracle     💤
- 🦉 Metis      💤
- 🎭 Momus      💤
- 🔥 Prometheus 💤
+ 🪨 Sisyphus    Pushing uphill...
+ 🔍 Explorer    Following a lead...
+ 📚 Librarian   Cross-referencing...
+ 🧙 Oracle      💤
+ 🦉 Metis       💤
+ 🎭 Momus       💤
+ 🔥 Prometheus  💤
 ```
 
-## What is this?
+---
 
-An opencode TUI + server plugin pair that shows agent activity in the sidebar. Each agent has a Greek mythology persona with personality-driven dialogue that changes based on what it's doing.
+You run [oh-my-opencode](https://github.com/code-yeongyu/oh-my-openagent). Agents fire in parallel. Background tasks fly. Sessions spawn and die.
 
-| Agent | Emoji | Role | Sample |
-|-------|-------|------|--------|
-| Sisyphus | 🪨 | Main session / task executor | *"The boulder rolls again"* |
-| Explorer | 🔍 | Codebase search | *"I smell a clue"* |
-| Librarian | 📚 | Documentation lookup | *"Let me check the archives"* |
-| Oracle | 🧙 | Architecture consultant | *"The mists part..."* |
-| Metis | 🦉 | Pre-planning analysis | *"Analyzing the angles"* |
-| Momus | 🎭 | Plan critic / reviewer | *"Don't shoot the messenger"* |
-| Prometheus | 🔥 | Plan builder | *"Fire in the forge"* |
+But you never **see** any of it.
 
-## How it works
+omo-olympus changes that. Seven agents. Seven Greek mythology personas. Real-time dialogue in your sidebar. Explorer digs through your codebase — *"I smell a clue"*. Oracle peers beyond the mists — *"The vision forms..."*. Momus tears your plan apart — *"Don't shoot the messenger"*.
 
-Two plugins working together:
+Inactive agents sleep: 💤. Active agents talk. You watch the gods work.
 
-1. **Server plugin** (`server.ts`) — hooks into opencode's plugin API to detect agent activity:
-   - `tool.execute.before` — detects which agent type is being dispatched via `task()` calls
-   - `tool.execute.after` — records task completion signals
-   - `command.execute.before` — detects mode-switching commands (`/start-work`, `/omc-plan`)
-   - `experimental.chat.system.transform` — detects main session mode (Prometheus vs Sisyphus) by reading system prompt content
-2. **TUI plugin** (`tui.tsx`) — reads from the pending queue on `session.created` events, maps child sessions to agent personas, and renders them in the `sidebar_content` slot with reactive state updates.
+## Why "Olympus"?
+
+You stare at a terminal all day. Agents run in the background. You have no idea what's happening until the final output drops.
+
+That's boring.
+
+So each agent got a name from Greek mythology, a personality that matches its role, and dialogue that changes every run. Once you see Sisyphus pushing his boulder while Oracle peers into the mists — a silent sidebar won't cut it anymore.
+
+## The Pantheon
+
+Not status labels. Characters.
+
+| | Agent | Role | They say things like... |
+|:---:|---|---|---|
+| 🪨 | **Sisyphus** | The one who never stops | *"One more push" · "The boulder rolls again" · "Summit reached ✓"* |
+| 🔍 | **Explorer** | Codebase detective | *"On the trail!" · "Checking every corner" · "Case closed"* |
+| 📚 | **Librarian** | The one who remembers everything | *"To the stacks!" · "Page 394..." · "The records confirm"* |
+| 🧙 | **Oracle** | Sees what others can't | *"You seek guidance?" · "Patience, mortal..." · "The path is clear"* |
+| 🦉 | **Metis** | Thinks before anyone acts | *"Hmm, interesting..." · "Weighing options..." · "Scope defined"* |
+| 🎭 | **Momus** | Brutally honest critic | *"Alright, roast time" · "Not convinced yet..." · "The truth hurts"* |
+| 🔥 | **Prometheus** | Forges the plan | *"Fire in the forge" · "Connecting the dots..." · "Blueprint ready"* |
+
+4 states per agent — **start**, **working**, **done**, **error** — with randomized lines each. Every run feels different.
+
+## Install
+
+### For Humans
+
+Paste this into your LLM agent (Claude Code, opencode, Cursor, etc.):
 
 ```
-~task() call → server detects agent type → /tmp/omo-pending.json → TUI pops on session.created → sidebar renders
-main session message → server reads system prompt → /tmp/omo-mode.json → TUI reads on session.status → sidebar switches persona
+Install and configure omo-olympus by following the instructions here:
+https://raw.githubusercontent.com/akasai/omo-olympus/refs/heads/main/docs/installation.md
 ```
 
-## Installation
+Seriously, let the agent handle it. It merges configs better than you.
 
-### Option A: npm package (recommended)
+### For LLM Agents
 
-Add to your opencode config files:
+Fetch the installation guide and follow it:
 
-**`~/.config/opencode/opencode.json`** — server plugin:
+```
+https://raw.githubusercontent.com/akasai/omo-olympus/refs/heads/main/docs/installation.md
+```
+
+### Or Just Do It Yourself
+
+Two config files. Restart. Done.
+
+**`~/.config/opencode/opencode.json`**
 ```json
 {
-  "plugin": [
-    "omo-olympus"
-  ]
+  "plugin": ["omo-olympus"]
 }
 ```
 
-**`~/.config/opencode/tui.json`** — TUI plugin:
+**`~/.config/opencode/tui.json`**
 ```json
 {
   "$schema": "https://opencode.ai/tui.json",
-  "plugin": [
-    ["omo-olympus", { "enabled": true }]
-  ]
+  "plugin": [["omo-olympus", { "enabled": true }]]
 }
 ```
 
-opencode installs npm plugins automatically on startup.
+opencode resolves the npm package on startup automatically.
 
-### Option B: manual copy
+## How It Works
+
+Two plugins. One shared queue. Zero config.
+
+```
+task() → server detects agent type → pending queue → TUI picks up on session event → sidebar talks
+main session → server reads system prompt → mode file → TUI switches persona on status event
+```
+
+**Server plugin** hooks into four interception points:
+- `tool.execute.before` — intercepts `task()` calls and infers the agent from `subagent_type` or `category`
+- `tool.execute.after` — records task completion signals
+- `command.execute.before` — detects mode-switching commands (`/start-work`, `/omc-plan`)
+- `experimental.chat.system.transform` — detects main session mode (Prometheus vs Sisyphus) by reading system prompt content
+
+**TUI plugin** renders in `sidebar_content` (top of sidebar, order 50), maps child sessions to personas via file-based IPC, and drives real-time updates with reactive signals.
+
+No websockets. No shared memory. A JSON file in `/tmp` and two plugins that talk through it.
+
+## Features
+
+|   | What | Why it matters |
+|:---:|---|---|
+| 📂 | **Collapsible** | Click the header to fold. Collapsed shows active agent count |
+| 🎨 | **Theme-aware** | Reads your opencode theme. RGBA buffer → hex, automatically |
+| ⚡ | **Real-time** | Solid.js reactive signals. Updates as agents work |
+| 🔇 | **Auto-sleep** | 3 seconds after done, agents return to 💤 |
+| 🔄 | **Concurrent tracking** | Multiple instances of the same agent tracked; sleeps only when all finish |
+| ❌ | **Error detection** | Agents show error dialogue on failure (5-second display) |
+| 🔥 | **Mode switching** | Detects Prometheus (plan) vs Sisyphus (build) via system prompt |
+| 🧹 | **Session cleanup** | Prevents memory leaks with `session.deleted` handler |
+
+## Requirements
+
+- [opencode](https://opencode.ai) with plugin support (`@opencode-ai/plugin` >= 1.4.3)
+- Agent orchestration that dispatches `task()` calls — e.g., [oh-my-opencode](https://github.com/code-yeongyu/oh-my-openagent)
+
+## Manual Install
+
+Skip npm. Copy the source files directly:
 
 ```bash
 mkdir -p ~/.config/opencode/plugins
@@ -78,67 +149,48 @@ cp src/tui.tsx ~/.config/opencode/plugins/omo-olympus.tsx
 cp src/server.ts ~/.config/opencode/plugins/omo-olympus-server.ts
 ```
 
-**Development tip:** use symlinks instead of copying for live-reload during development:
+Register local paths instead:
+```jsonc
+// opencode.json
+{ "plugin": ["./plugins/omo-olympus-server.ts"] }
+
+// tui.json
+{ "plugin": [["./plugins/omo-olympus.tsx", { "enabled": true }]] }
+```
+
+## Contributing
+
+Issues and PRs welcome. If you have an idea for a new persona, a better line of dialogue, or a bug to report — [open an issue](https://github.com/akasai/omo-olympus/issues).
+
+To develop locally:
 
 ```bash
-mkdir -p ~/.config/opencode/plugins
-ln -sf /path/to/omo-olympus/src/server.ts ~/.config/opencode/plugins/omo-olympus-server.ts
-ln -sf /path/to/omo-olympus/src/tui.tsx ~/.config/opencode/plugins/omo-olympus.tsx
+git clone https://github.com/akasai/omo-olympus.git
+cp src/tui.tsx ~/.config/opencode/plugins/omo-olympus.tsx
+cp src/server.ts ~/.config/opencode/plugins/omo-olympus-server.ts
 ```
 
-Changes to source files take effect on opencode restart — no need to re-copy.
-
-Then register local paths in `opencode.json` and `tui.json`:
-```json
-// opencode.json → "plugin": ["./plugins/omo-olympus-server.ts"]
-// tui.json → "plugin": [["./plugins/omo-olympus.tsx", { "enabled": true }]]
+**Tip:** use symlinks for live-reload during development:
+```bash
+ln -sf $(pwd)/src/server.ts ~/.config/opencode/plugins/omo-olympus-server.ts
+ln -sf $(pwd)/src/tui.tsx ~/.config/opencode/plugins/omo-olympus.tsx
 ```
 
-### Restart opencode
+Edit, restart opencode, see your changes live.
 
-Both plugins load at startup. Restart to pick up changes.
+Run tests:
 
-## Features
+```bash
+npm test
+```
 
-- **Collapsible sidebar section** — click the "▼ Olympus" header to toggle
-- **Theme-aware colors** — reads from opencode theme (RGBA buffer → hex conversion)
-- **Active/sleep states** — active agents show dialogue, inactive show 💤
-- **Auto-sleep** — agents show "done" dialogue for 3 seconds, then go to sleep
-- **File-based dedup** — handles opencode's double-fire on `tool.execute.before`
-- **7 agent personas** with 4-5 dialogue lines per state (start, working, done, error)
-- **Concurrent agent tracking** — multiple instances of the same agent type are tracked; only sleeps when all finish
-- **Error state detection** — agents show error dialogue on `session.error` events (5-second display)
-- **Main session mode switching** — detects Prometheus (plan mode) vs Sisyphus (build mode) via system prompt analysis
-- **Session cleanup** — `session.deleted` handler prevents memory leaks in session tracking maps
-- **Stale timer protection** — sleep timers are tracked and cleared when agents reactivate
+## Known Quirks
 
-## Requirements
-
-- [opencode](https://opencode.ai) with `@opencode-ai/plugin` >= 1.4.3
-- Agent orchestration that uses `task()` calls (e.g., [oh-my-opencode](https://github.com/anthropics/oh-my-opencode))
-
-## Known quirks
-
-- `<text bold>` uses `color` prop, regular `<text>` uses `fg` prop in opentui
-- Collapse toggle uses `onMouseDown` (not `onClick`)
-- `tool.execute.before` fires twice per tool call — dedup via last-entry comparison with 200ms window
-- Server and TUI plugins share state via `/tmp/omo-pending.json` (file-based IPC)
-- Main session mode detection uses `experimental.chat.system.transform` — this API may change in future opencode versions
-- Main session mode is shared via `/tmp/omo-mode.json` (file-based IPC, writes only on mode change)
+- `tool.execute.before` fires twice per tool call — dedup via 200ms window
+- Main session mode detection uses `experimental.chat.system.transform` — API may change in future opencode versions
 - System prompt keyword matching (`"You are Prometheus"`) is coupled to OMC's internal prompt format
+- Server ↔ TUI communication via `/tmp/omo-pending.json` and `/tmp/omo-mode.json` (file-based IPC)
 
 ## License
 
 MIT
-
----
-
-## 한국어
-
-opencode 사이드바에 그리스 신화 캐릭터 페르소나를 표시하는 플러그인입니다.
-
-각 에이전트(탐정, 사서, 현자 등)가 작업 상태에 맞는 대사를 실시간으로 보여줍니다. 비활성 에이전트는 💤 상태로 표시됩니다.
-
-### 설치
-
-`opencode.json`에 `"omo-olympus"` 추가, `tui.json`에 `["omo-olympus", { "enabled": true }]` 추가 후 재시작. npm 패키지는 opencode가 자동 설치합니다.
