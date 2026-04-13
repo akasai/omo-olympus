@@ -25,7 +25,7 @@ function logError(hook: string, err: unknown, input?: any) {
   try { fs.appendFileSync(ERROR_LOG, line) } catch {}
 }
 
-function inferAgent(tool: string, args: any): string | null {
+export function inferAgent(tool: string, args: any): string | null {
   if (tool !== "task" && tool !== "delegate_task") return null
   const sub = String(args?.subagent_type ?? "").toLowerCase()
   if (sub === "explore") return "explore"

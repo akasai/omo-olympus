@@ -6,10 +6,14 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/akasai/omo-olympus"
+    "url": "https://github.com/orca/omo-olympus"
   },
-  "homepage": "https://github.com/akasai/omo-olympus#readme",
+  "homepage": "https://github.com/orca/omo-olympus#readme",
   "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
   "exports": {
     "./server": "./src/server.ts",
     "./tui": "./src/tui.tsx"
@@ -26,22 +30,14 @@
     "agent-persona",
     "greek-mythology"
   ],
-  "scripts": {
-    "test": "vitest run",
-    "test:watch": "vitest"
+  "devDependencies": {
+    "vitest": "4.1.4"
   },
   "peerDependencies": {
     "@opencode-ai/plugin": ">=1.4.3"
   },
   "peerDependenciesMeta": {
-    "@opentui/core": {
-      "optional": true
-    },
-    "@opentui/solid": {
-      "optional": true
-    }
-  },
-  "devDependencies": {
-    "vitest": "4.1.4"
+    "@opentui/core": { "optional": true },
+    "@opentui/solid": { "optional": true }
   }
 }
