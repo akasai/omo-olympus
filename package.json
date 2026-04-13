@@ -1,6 +1,6 @@
 {
   "name": "omo-olympus",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Greek mythology personas for opencode agents — watch Sisyphus, Oracle, and friends narrate your AI workflow in the sidebar",
   "author": "orca",
   "license": "MIT",
@@ -37,7 +37,11 @@
     "@opencode-ai/plugin": ">=1.4.3"
   },
   "peerDependenciesMeta": {
-    "@opentui/core": { "optional": true },
-    "@opentui/solid": { "optional": true }
+    "@opentui/core": {
+      "optional": true
+    },
+    "@opentui/solid": {
+      "optional": true
+    }
   }
 }
