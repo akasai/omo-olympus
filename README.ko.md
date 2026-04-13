@@ -108,9 +108,14 @@ opencode가 시작할 때 npm 패키지를 자동으로 해석합니다.
 
 ```
 task() → 서버가 에이전트 타입 감지 → 대기열 → TUI가 세션 이벤트에서 수신 → 사이드바가 말한다
+메인 세션 → 서버가 시스템 프롬프트 확인 → 모드 파일 → TUI가 상태 이벤트에서 페르소나 전환
 ```
 
-**서버 플러그인**이 `tool.execute.before`를 후킹하고, `task()` 호출을 가로채서, `subagent_type`, `category`, description 키워드로 에이전트를 추론합니다.
+**서버 플러그인**이 네 가지 인터셉션 포인트를 후킹합니다:
+- `tool.execute.before` — `task()` 호출을 가로채서 `subagent_type` 또는 `category`로 에이전트 추론
+- `tool.execute.after` — 태스크 완료 시그널 기록
+- `command.execute.before` — 모드 전환 명령어 감지 (`/start-work`, `/omc-plan`)
+- `experimental.chat.system.transform` — 시스템 프롬프트를 읽어 메인 세션 모드 감지 (Prometheus vs Sisyphus)
 
 **TUI 플러그인**이 `sidebar_content`에 렌더링하고 (사이드바 최상단, order 50), 파일 기반 IPC로 자식 세션을 페르소나에 매핑하고, 리액티브 시그널로 실시간 업데이트합니다.
 
@@ -124,6 +129,10 @@ task() → 서버가 에이전트 타입 감지 → 대기열 → TUI가 세션 
 | 🎨 | **테마 연동** | opencode 테마 색상 자동 반영. RGBA buffer → hex 변환 |
 | ⚡ | **실시간** | Solid.js 리액티브 시그널. 에이전트 작업과 동시에 업데이트 |
 | 🔇 | **자동 수면** | 완료 3초 후 💤로 복귀 |
+| 🔄 | **동시 실행 추적** | 같은 에이전트의 여러 인스턴스를 추적; 전부 끝나야 수면 |
+| ❌ | **에러 감지** | 실패 시 에러 대사 표시 (5초간 표시) |
+| 🔥 | **모드 전환** | 시스템 프롬프트로 Prometheus(계획) vs Sisyphus(실행) 감지 |
+| 🧹 | **세션 정리** | `session.deleted` 핸들러로 메모리 릭 방지 |
 
 ## 요구사항
 
@@ -161,6 +170,12 @@ cp src/tui.tsx ~/.config/opencode/plugins/omo-olympus.tsx
 cp src/server.ts ~/.config/opencode/plugins/omo-olympus-server.ts
 ```
 
+**팁:** 심링크를 사용하면 복사 없이 실시간 반영됩니다:
+```bash
+ln -sf $(pwd)/src/server.ts ~/.config/opencode/plugins/omo-olympus-server.ts
+ln -sf $(pwd)/src/tui.tsx ~/.config/opencode/plugins/omo-olympus.tsx
+```
+
 수정하고, opencode 재시작하면 바로 확인 가능합니다.
 
 테스트 실행:
@@ -168,6 +183,13 @@ cp src/server.ts ~/.config/opencode/plugins/omo-olympus-server.ts
 ```bash
 npm test
 ```
+
+## 알려진 이슈
+
+- `tool.execute.before`는 도구 호출당 2번 발생 — 200ms 윈도우로 중복 제거
+- 메인 세션 모드 감지에 `experimental.chat.system.transform` 사용 — 향후 opencode 버전에서 API 변경 가능
+- 시스템 프롬프트 키워드 매칭(`"You are Prometheus"`)이 OMC 내부 프롬프트 형식에 의존
+- 서버 ↔ TUI 통신은 `/tmp/omo-pending.json`, `/tmp/omo-mode.json` 파일 기반 IPC
 
 ## 라이선스
 
