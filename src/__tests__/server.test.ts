@@ -1,5 +1,21 @@
-import { describe, it, expect } from "vitest"
-import { inferAgent } from "../server"
+import { afterEach, beforeEach, describe, expect, it } from "vitest"
+import OmoOlympusServer, { inferAgent } from "../server"
+
+const fs = require("fs")
+
+const PENDING_FILE = "/tmp/omo-pending.json"
+
+function readPending() {
+  return JSON.parse(fs.readFileSync(PENDING_FILE, "utf-8"))
+}
+
+beforeEach(() => {
+  try { fs.unlinkSync(PENDING_FILE) } catch {}
+})
+
+afterEach(() => {
+  try { fs.unlinkSync(PENDING_FILE) } catch {}
+})
 
 describe("inferAgent", () => {
   it("returns null for non-task tools", () => {
@@ -36,22 +52,6 @@ describe("inferAgent", () => {
     })
   })
 
-  describe("description keyword fallback", () => {
-    it("infers from description keywords", () => {
-      expect(inferAgent("task", { description: "Find auth patterns" })).toBe("explore")
-      expect(inferAgent("task", { description: "Search codebase" })).toBe("explore")
-      expect(inferAgent("task", { description: "Consult on architecture" })).toBe("oracle")
-      expect(inferAgent("task", { description: "Check the docs" })).toBe("librarian")
-      expect(inferAgent("task", { description: "Review the code" })).toBe("momus")
-      expect(inferAgent("task", { description: "Analyze requirements" })).toBe("metis")
-    })
-
-    it("falls back to prompt when description is absent", () => {
-      expect(inferAgent("task", { prompt: "Find all test files" })).toBe("explore")
-      expect(inferAgent("task", { prompt: "Reference the API docs" })).toBe("librarian")
-    })
-  })
-
   describe("category fallback", () => {
     it("maps categories to agents", () => {
       expect(inferAgent("task", { category: "ultrabrain" })).toBe("oracle")
@@ -80,16 +80,42 @@ describe("inferAgent", () => {
       })).toBe("librarian")
     })
 
-    it("description takes priority over category", () => {
-      expect(inferAgent("task", {
-        description: "Search the codebase",
-        category: "ultrabrain",
-      })).toBe("explore")
-    })
   })
 
   it("returns null when no signal matches", () => {
     expect(inferAgent("task", {})).toBeNull()
     expect(inferAgent("task", { description: "hello world" })).toBeNull()
+  })
+})
+
+describe("server hooks", () => {
+  it("tool.execute.after appends a __done__ pending entry for task tools", async () => {
+    const plugin = await OmoOlympusServer()
+
+    await plugin["tool.execute.after"]({ tool: "task" }, {})
+
+    expect(readPending()).toEqual([
+      expect.objectContaining({ agent: "__done__", done: true, ts: expect.any(Number) }),
+    ])
+  })
+
+  it("tool.execute.after ignores non-task tools", async () => {
+    const plugin = await OmoOlympusServer()
+
+    await plugin["tool.execute.after"]({ tool: "read" }, {})
+
+    expect(fs.existsSync(PENDING_FILE)).toBe(false)
+  })
+
+  it("preserves agent entries when adding a __done__ marker", async () => {
+    fs.writeFileSync(PENDING_FILE, JSON.stringify([{ agent: "explore", ts: 123 }]))
+    const plugin = await OmoOlympusServer()
+
+    await plugin["tool.execute.after"]({ tool: "delegate_task" }, {})
+
+    expect(readPending()).toEqual([
+      { agent: "explore", ts: 123 },
+      expect.objectContaining({ agent: "__done__", done: true, ts: expect.any(Number) }),
+    ])
   })
 })

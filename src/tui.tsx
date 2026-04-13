@@ -1,20 +1,24 @@
 /** @jsxImportSource @opentui/solid */
+/// <reference path="./shims.d.ts" />
 import { createSignal } from "solid-js"
 import type {
   TuiPlugin,
   TuiPluginModule,
   TuiSlotContext,
 } from "@opencode-ai/plugin/tui"
-import {
-  AGENT_KEYS,
-  personas,
-  padName,
-  randomLine,
-  type AgentKey,
-} from "./personas"
+import { AGENT_KEYS, personas, NAME_WIDTH, padName, randomLine } from "./personas"
+import type { AgentKey, Persona } from "./personas"
 
 const PENDING_FILE = "/tmp/omo-pending.json"
+const MODE_FILE = "/tmp/omo-mode.json"
 const _fs = require("fs")
+
+function readMode(): "prometheus" | "build" {
+  try {
+    const data = JSON.parse(_fs.readFileSync(MODE_FILE, "utf-8"))
+    return data.mode === "prometheus" ? "prometheus" : "build"
+  } catch { return "build" }
+}
 
 interface PendingEntry { agent: string; ts: number }
 
@@ -26,10 +30,14 @@ function writePending(list: PendingEntry[]) {
 }
 function popPending(): string | null {
   const list = readPending()
-  if (list.length === 0) return null
-  const entry = list.shift()!
+  while (list.length > 0) {
+    const entry = list.shift()!
+    if (entry.agent === "__done__") continue
+    writePending(list)
+    return entry.agent
+  }
   writePending(list)
-  return entry.agent
+  return null
 }
 
 interface AgentState {
@@ -38,8 +46,10 @@ interface AgentState {
 }
 
 const sessionAgentMap = new Map<string, AgentKey>()
+const activeSessions = new Map<AgentKey, Set<string>>()
+const sleepTimers = new Map<AgentKey, ReturnType<typeof setTimeout>>()
 
-const tui: TuiPlugin = async (api, _options, _meta) => {
+const tui: TuiPlugin = async (...[api, _options, _meta]) => {
   const signals: Record<AgentKey, [() => AgentState, (s: AgentState) => void]> = {} as any
   for (const key of AGENT_KEYS) {
     signals[key] = createSignal<AgentState>({ active: false, speech: "" })
@@ -49,6 +59,11 @@ const tui: TuiPlugin = async (api, _options, _meta) => {
   function setAgent(key: AgentKey, state: AgentState) { signals[key][1](state) }
 
   function activateAgent(key: AgentKey, state: string) {
+    const existing = sleepTimers.get(key)
+    if (existing) {
+      clearTimeout(existing)
+      sleepTimers.delete(key)
+    }
     setAgent(key, { active: true, speech: randomLine(personas[key], state) })
   }
 
@@ -58,10 +73,15 @@ const tui: TuiPlugin = async (api, _options, _meta) => {
 
   function finishAgent(key: AgentKey) {
     setAgent(key, { active: true, speech: randomLine(personas[key], "done") })
-    setTimeout(() => sleepAgent(key), 3000)
+    const timer = setTimeout(() => {
+      sleepTimers.delete(key)
+      sleepAgent(key)
+    }, 3000)
+    sleepTimers.set(key, timer)
   }
 
-  activateAgent("build", "start")
+  const initialMode = readMode()
+  activateAgent(initialMode, "start")
 
   api.event.on("session.created", (event: any) => {
     const info = event.properties?.info
@@ -71,6 +91,8 @@ const tui: TuiPlugin = async (api, _options, _meta) => {
         ? agentName as AgentKey
         : "build"
       sessionAgentMap.set(info.id, key)
+      if (!activeSessions.has(key)) activeSessions.set(key, new Set())
+      activeSessions.get(key)!.add(info.id)
       activateAgent(key, "start")
     }
   })
@@ -82,12 +104,65 @@ const tui: TuiPlugin = async (api, _options, _meta) => {
 
     if (key && key !== "build") {
       if (status === "busy") activateAgent(key, "working")
-      if (status === "idle") finishAgent(key)
+      if (status === "idle") {
+        const sessions = activeSessions.get(key)
+        if (sessions) {
+          sessions.delete(sessionId)
+          if (sessions.size === 0) {
+            activeSessions.delete(key)
+            finishAgent(key)
+          }
+        } else {
+          finishAgent(key)
+        }
+      }
     } else if (!key) {
+      const mainAgent = readMode()
       if (status === "busy") {
-        activateAgent("build", "working")
+        activateAgent(mainAgent, "working")
+        if (mainAgent === "prometheus") sleepAgent("build")
+        if (mainAgent === "build") sleepAgent("prometheus")
       } else if (status === "idle") {
-        setAgent("build", { active: true, speech: randomLine(personas.build, "done") })
+        setAgent(mainAgent, { active: true, speech: randomLine(personas[mainAgent], "done") })
+      }
+    }
+  })
+
+  api.event.on("session.error" as any, (event: any) => {
+    const sessionId = event.properties?.sessionID
+    const key = sessionAgentMap.get(sessionId ?? "")
+    if (key) {
+      sessionAgentMap.delete(sessionId ?? "")
+      const sessions = activeSessions.get(key)
+      if (sessions) {
+        sessions.delete(sessionId)
+        if (sessions.size === 0) activeSessions.delete(key)
+      }
+      const existing = sleepTimers.get(key)
+      if (existing) { clearTimeout(existing); sleepTimers.delete(key) }
+      setAgent(key, { active: true, speech: randomLine(personas[key], "error") })
+      const timer = setTimeout(() => {
+        sleepTimers.delete(key)
+        sleepAgent(key)
+      }, 5000)
+      sleepTimers.set(key, timer)
+    }
+  })
+
+  api.event.on("session.deleted" as any, (event: any) => {
+    const sessionId = event.properties?.sessionID ?? event.properties?.id
+    if (sessionId) {
+      const key = sessionAgentMap.get(sessionId)
+      sessionAgentMap.delete(sessionId)
+      if (key) {
+        const sessions = activeSessions.get(key)
+        if (sessions) {
+          sessions.delete(sessionId)
+          if (sessions.size === 0) activeSessions.delete(key)
+        }
+        if (!activeSessions.get(key)?.size && !sleepTimers.has(key)) {
+          sleepAgent(key)
+        }
       }
     }
   })
@@ -110,7 +185,6 @@ const tui: TuiPlugin = async (api, _options, _meta) => {
         const accent = toHex(t.primary) ?? "#82AAFF"
         const speech_color = toHex(t.textMuted) ?? "#546E7A"
         const dim = toHex(t.textMuted) ?? "#546E7A"
-        const fg = toHex(t.text) ?? "#EEFFFF"
         const isOpen = open()
         const activeCount = AGENT_KEYS.filter((k) => getAgent(k).active).length
 
@@ -123,13 +197,14 @@ const tui: TuiPlugin = async (api, _options, _meta) => {
               {!isOpen ? <text fg={dim}>{` (${activeCount} agents)`}</text> : null}
             </box>
             {isOpen ? AGENT_KEYS.map((key) => {
-              const persona = personas[key]
+              const persona: Persona = personas[key]
               const state = getAgent(key)
+              const label = padName(persona.name).slice(0, NAME_WIDTH)
 
               return (
                 <box height={1} flexDirection="row">
                   <text color={state.active ? accent : dim}>
-                    {` ${persona.emoji} ${padName(persona.name)} `}
+                    {` ${persona.emoji} ${label} `}
                   </text>
                   <text color={state.active ? speech_color : dim} fg={state.active ? speech_color : dim}>
                     {state.active ? state.speech : "💤"}
