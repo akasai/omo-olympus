@@ -277,7 +277,7 @@ const tui: TuiPlugin = async (api, _options, _meta) => {
         }
         const accent = toHex(t.primary) ?? "#82AAFF"
         const fgColor = t.text ?? "#EEFFFF"
-        const dim = toHex(t.textMuted) ?? "#546E7A"
+        const dim = t.textMuted ?? "#546E7A"
         const isOpen = open()
         const activeCount = AGENT_KEYS.filter((k) => getAgent(k).active).length
 
