@@ -15,6 +15,11 @@
 
 <!-- </CENTERED SECTION FOR GITHUB DISPLAY> -->
 
+<div align="center">
+<table>
+<tr>
+<td align="center" valign="middle">
+
 ```
 ▼ Olympus
  🪨 Sisyphus    Pushing uphill...
@@ -25,6 +30,16 @@
  🎭 Momus       💤
  🔥 Prometheus  💤
 ```
+
+</td>
+<td align="center" valign="middle">
+
+![omo-olympus in action](docs/screenshot.png)
+
+</td>
+</tr>
+</table>
+</div>
 
 ---
 

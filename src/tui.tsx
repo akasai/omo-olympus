@@ -1,5 +1,4 @@
 /** @jsxImportSource @opentui/solid */
-/// <reference path="./shims.d.ts" />
 import { createSignal } from "solid-js"
 import type {
   TuiPlugin,
@@ -143,7 +142,7 @@ const sessionAgentMap = new Map<string, AgentKey>()
 const activeSessions = new Map<AgentKey, Set<string>>()
 const sleepTimers = new Map<AgentKey, ReturnType<typeof setTimeout>>()
 
-const tui: TuiPlugin = async (...[api, _options, _meta]) => {
+const tui: TuiPlugin = async (api, _options, _meta) => {
   const signals: Record<AgentKey, [() => AgentState, (s: AgentState) => void]> = {} as any
   for (const key of AGENT_KEYS) {
     signals[key] = createSignal<AgentState>({ active: false, speech: "" })
