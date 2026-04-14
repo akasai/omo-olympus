@@ -267,15 +267,6 @@ const tui: TuiPlugin = async (api, _options, _meta) => {
     slots: {
       sidebar_content(ctx: TuiSlotContext, _props: any) {
         const t = ctx.theme.current
-        const toHex = (c: any): string | undefined => {
-          if (!c?.buffer) return undefined
-          const b = c.buffer
-          const r = Math.round(b[0] * 255)
-          const g = Math.round(b[1] * 255)
-          const bl = Math.round(b[2] * 255)
-          return `#${r.toString(16).padStart(2,"0")}${g.toString(16).padStart(2,"0")}${bl.toString(16).padStart(2,"0")}`
-        }
-        const accent = toHex(t.primary) ?? "#82AAFF"
         const fgColor = t.text ?? "#EEFFFF"
         const dim = t.textMuted ?? "#546E7A"
         const isOpen = open()
@@ -284,7 +275,7 @@ const tui: TuiPlugin = async (api, _options, _meta) => {
         return (
           <box flexDirection="column" marginBottom={1}>
             <box height={1} flexDirection="row" onMouseDown={() => setOpen(!open())}>
-              <text bold fg={accent}>
+              <text bold fg={fgColor}>
                 {isOpen ? "▼" : "▶"}{" Olympus"}
               </text>
               {!isOpen ? <text fg={dim}>{` (${activeCount} agents)`}</text> : null}
