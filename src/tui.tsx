@@ -284,7 +284,7 @@ const tui: TuiPlugin = async (api, _options, _meta) => {
         return (
           <box flexDirection="column" marginBottom={1}>
             <box height={1} flexDirection="row" onMouseDown={() => setOpen(!open())}>
-              <text bold color={accent}>
+              <text bold fg={accent}>
                 {isOpen ? "▼" : "▶"}{" Olympus"}
               </text>
               {!isOpen ? <text fg={dim}>{` (${activeCount} agents)`}</text> : null}
