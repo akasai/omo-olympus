@@ -276,7 +276,7 @@ const tui: TuiPlugin = async (api, _options, _meta) => {
           return `#${r.toString(16).padStart(2,"0")}${g.toString(16).padStart(2,"0")}${bl.toString(16).padStart(2,"0")}`
         }
         const accent = toHex(t.primary) ?? "#82AAFF"
-        const speech_color = toHex(t.textMuted) ?? "#546E7A"
+        const fgColor = t.text ?? "#EEFFFF"
         const dim = toHex(t.textMuted) ?? "#546E7A"
         const isOpen = open()
         const activeCount = AGENT_KEYS.filter((k) => getAgent(k).active).length
@@ -296,10 +296,10 @@ const tui: TuiPlugin = async (api, _options, _meta) => {
 
               return (
                 <box height={1} flexDirection="row">
-                  <text color={state.active ? accent : dim}>
+                  <text fg={state.active ? fgColor : dim}>
                     {` ${persona.emoji} ${label} `}
                   </text>
-                  <text color={state.active ? speech_color : dim} fg={state.active ? speech_color : dim}>
+                  <text fg={dim}>
                     {state.active ? state.speech : "💤"}
                   </text>
                 </box>
