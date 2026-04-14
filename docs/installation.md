@@ -15,11 +15,11 @@ An opencode TUI + server plugin pair that displays Greek mythology agent persona
 
 Edit `~/.config/opencode/opencode.json`. Create the file if it doesn't exist.
 
-Add `"omo-olympus"` to the `plugin` array:
+Add `"omo-olympus@latest"` to the `plugin` array:
 
 ```json
 {
-  "plugin": ["omo-olympus"]
+  "plugin": ["omo-olympus@latest"]
 }
 ```
 
@@ -27,7 +27,7 @@ Add `"omo-olympus"` to the `plugin` array:
 
 ```json
 {
-  "plugin": ["existing-plugin", "omo-olympus"]
+  "plugin": ["existing-plugin", "omo-olympus@latest"]
 }
 ```
 
@@ -35,13 +35,13 @@ Add `"omo-olympus"` to the `plugin` array:
 
 Edit `~/.config/opencode/tui.json`. Create the file if it doesn't exist.
 
-Add `["omo-olympus", { "enabled": true }]` to the `plugin` array:
+Add `["omo-olympus@latest", { "enabled": true }]` to the `plugin` array:
 
 ```json
 {
   "$schema": "https://opencode.ai/tui.json",
   "plugin": [
-    ["omo-olympus", { "enabled": true }]
+    ["omo-olympus@latest", { "enabled": true }]
   ]
 }
 ```
@@ -53,7 +53,7 @@ Add `["omo-olympus", { "enabled": true }]` to the `plugin` array:
   "$schema": "https://opencode.ai/tui.json",
   "plugin": [
     ["existing-plugin", { "enabled": true }],
-    ["omo-olympus", { "enabled": true }]
+    ["omo-olympus@latest", { "enabled": true }]
   ]
 }
 ```
@@ -85,6 +85,6 @@ After restart, the sidebar should show a collapsible "▼ Olympus" section at th
 
 ## Uninstall
 
-1. Remove `"omo-olympus"` from `~/.config/opencode/opencode.json` plugin array
-2. Remove `["omo-olympus", { "enabled": true }]` from `~/.config/opencode/tui.json` plugin array
+1. Remove `"omo-olympus@latest"` from `~/.config/opencode/opencode.json` plugin array
+2. Remove `["omo-olympus@latest", { "enabled": true }]` from `~/.config/opencode/tui.json` plugin array
 3. Restart opencode

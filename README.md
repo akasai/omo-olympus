@@ -18,7 +18,7 @@
 <div align="center">
 <table>
 <tr>
-<td align="center" valign="middle">
+<td>
 
 ```
 ▼ Olympus
@@ -32,7 +32,7 @@
 ```
 
 </td>
-<td align="center" valign="middle">
+<td>
 
 ![omo-olympus in action](docs/screenshot.png)
 
