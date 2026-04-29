@@ -11,15 +11,37 @@ An opencode TUI + server plugin pair that displays Greek mythology agent persona
 - [opencode](https://opencode.ai) installed and working
 - Plugin support (`@opencode-ai/plugin` >= 1.4.3)
 
-## Step 1: Configure the server plugin
+## Step 1: Install the plugin
+
+Run the following command in the terminal:
+
+```bash
+opencode plugin omo-olympus
+```
+
+This automatically:
+- Installs the `omo-olympus` npm package
+- Detects both the server (`./server`) and TUI (`./tui`) entrypoints
+- Adds the server plugin to `opencode.json`
+- Adds the TUI plugin to `tui.json`
+
+## Step 2: Restart opencode
+
+Both plugins load at startup. Restart opencode to activate omo-olympus.
+
+## Manual Setup (alternative)
+
+If `opencode plugin` is not available, configure both files manually.
+
+### Configure the server plugin
 
 Edit `~/.config/opencode/opencode.json`. Create the file if it doesn't exist.
 
-Add `"omo-olympus@latest"` to the `plugin` array:
+Add `"omo-olympus"` to the `plugin` array:
 
 ```json
 {
-  "plugin": ["omo-olympus@latest"]
+  "plugin": ["omo-olympus"]
 }
 ```
 
@@ -27,21 +49,21 @@ Add `"omo-olympus@latest"` to the `plugin` array:
 
 ```json
 {
-  "plugin": ["existing-plugin", "omo-olympus@latest"]
+  "plugin": ["existing-plugin", "omo-olympus"]
 }
 ```
 
-## Step 2: Configure the TUI plugin
+### Configure the TUI plugin
 
 Edit `~/.config/opencode/tui.json`. Create the file if it doesn't exist.
 
-Add `["omo-olympus@latest", { "enabled": true }]` to the `plugin` array:
+Add `["omo-olympus", { "enabled": true }]` to the `plugin` array:
 
 ```json
 {
   "$schema": "https://opencode.ai/tui.json",
   "plugin": [
-    ["omo-olympus@latest", { "enabled": true }]
+    ["omo-olympus", { "enabled": true }]
   ]
 }
 ```
@@ -53,14 +75,12 @@ Add `["omo-olympus@latest", { "enabled": true }]` to the `plugin` array:
   "$schema": "https://opencode.ai/tui.json",
   "plugin": [
     ["existing-plugin", { "enabled": true }],
-    ["omo-olympus@latest", { "enabled": true }]
+    ["omo-olympus", { "enabled": true }]
   ]
 }
 ```
 
-## Step 3: Restart opencode
-
-Both plugins load at startup. Restart opencode to activate omo-olympus.
+Restart opencode after updating the config files.
 
 ## Verification
 
@@ -79,12 +99,12 @@ After restart, the sidebar should show a collapsible "▼ Olympus" section at th
 
 ## Troubleshooting
 
-- **Plugin not showing**: Both `opencode.json` and `tui.json` must be configured. One alone is not enough.
+- **Plugin not showing**: Both `opencode.json` and `tui.json` must be configured. The `opencode plugin` command handles both automatically. If you configured manually, make sure both files are updated.
 - **Duplicate rendering**: The plugin should be registered in one location only (global OR project, not both).
 - **No agent activity**: omo-olympus visualizes `task()` calls from orchestration tools like oh-my-opencode. Without an orchestrator, only Sisyphus (main session) will be active.
 
 ## Uninstall
 
-1. Remove `"omo-olympus@latest"` from `~/.config/opencode/opencode.json` plugin array
-2. Remove `["omo-olympus@latest", { "enabled": true }]` from `~/.config/opencode/tui.json` plugin array
+1. Remove `"omo-olympus"` from `~/.config/opencode/opencode.json` plugin array
+2. Remove `["omo-olympus", { "enabled": true }]` from `~/.config/opencode/tui.json` plugin array
 3. Restart opencode
