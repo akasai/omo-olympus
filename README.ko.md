@@ -77,13 +77,30 @@ omo-olympus가 바꿔줍니다. 7명의 에이전트. 7개의 그리스 신화 �
 
 ## 설치
 
-터미널에서 실행하세요:
-
 ```bash
 opencode plugin omo-olympus
 ```
 
 끝. OpenCode가 패키지에서 서버와 TUI 진입점을 자동으로 감지해서 `opencode.json`과 `tui.json`을 모두 업데이트합니다. opencode를 재시작하면 활성화됩니다.
+
+### For Humans
+
+아래 프롬프트를 LLM 에이전트(Claude Code, opencode, Cursor 등)에 붙여넣으세요:
+
+```
+Install and configure omo-olympus by following the instructions here:
+https://raw.githubusercontent.com/akasai/omo-olympus/refs/heads/main/docs/installation.md
+```
+
+진심으로 에이전트한테 시키세요. 설정 머지는 에이전트가 더 잘합니다.
+
+### For LLM Agents
+
+설치 가이드를 가져와서 따라하세요:
+
+```
+https://raw.githubusercontent.com/akasai/omo-olympus/refs/heads/main/docs/installation.md
+```
 
 ### 수동 설정
 

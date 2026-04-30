@@ -77,13 +77,30 @@ Not status labels. Characters.
 
 ## Install
 
-Run this in your terminal:
-
 ```bash
 opencode plugin omo-olympus
 ```
 
 That's it. OpenCode detects both the server and TUI entrypoints from the package and updates `opencode.json` and `tui.json` automatically. Restart opencode to activate.
+
+### For Humans
+
+Paste this into your LLM agent (Claude Code, opencode, Cursor, etc.):
+
+```
+Install and configure omo-olympus by following the instructions here:
+https://raw.githubusercontent.com/akasai/omo-olympus/refs/heads/main/docs/installation.md
+```
+
+Seriously, let the agent handle it. It merges configs better than you.
+
+### For LLM Agents
+
+Fetch the installation guide and follow it:
+
+```
+https://raw.githubusercontent.com/akasai/omo-olympus/refs/heads/main/docs/installation.md
+```
 
 ### Manual Setup
 
