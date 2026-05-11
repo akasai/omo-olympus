@@ -273,7 +273,7 @@ const tui: TuiPlugin = async (api, _options, _meta) => {
         const activeCount = AGENT_KEYS.filter((k) => getAgent(k).active).length
 
         return (
-          <box flexDirection="column" marginBottom={1}>
+          <box flexDirection="column">
             <box height={1} flexDirection="row" onMouseDown={() => setOpen(!open())}>
               <text bold fg={fgColor}>
                 {isOpen ? "▼" : "▶"}{" Olympus"}
